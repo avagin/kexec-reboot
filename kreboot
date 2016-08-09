@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+target=$1
+[ -z "$target" ] &&
+	target=`grubby --default-kernel`
+IFS='
+'
+for l in `grubby --info=$target`; do
+	eval `echo $l | sed "s|^\(\S*\)=\([^'\"].*\)$|\1='\2'|"`
+done
+echo Boot "$title"?
+read
+kexec -l "$kernel" --initrd="$initrd" --command-line="root=$root $args"
+systemctl kexec
