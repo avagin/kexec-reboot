@@ -2,6 +2,10 @@
 
 set -e
 
+# Check that all programs we need are available, exit if not
+# (relying on 'set -e' and hash returning non-zero for errors)
+hash grubby kexec systemctl
+
 target=$1
 [ -z "$target" ] &&
 	target=`grubby --default-kernel`
