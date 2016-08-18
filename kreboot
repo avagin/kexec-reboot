@@ -26,8 +26,15 @@ target=''
 while test $# -gt 0; do
 	case $1 in
 		-w|--wait)
-			# FIXME: check that arg exists
+			if [ "$#" -lt 2 ]; then
+				echo "Option $1 requires an argument" 1>&2
+				usage 1
+			fi
 			wait=$2
+			if ! printf "%f" $wait > /dev/null 2>&1; then
+				echo "Option $1 argument not a number" 1>&2
+				usage 1
+			fi
 			shift
 			;;
 		--nowait)
