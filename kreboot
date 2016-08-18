@@ -2,6 +2,7 @@
 
 set -e
 [ -n "$BASH" ] && set -o pipefail
+set -u
 
 usage() {
 	cat << EOF
