@@ -4,9 +4,15 @@ set -e
 [ -n "$BASH" ] && set -o pipefail
 set -u
 
+# defaults
+pause=10
+
 usage() {
 	cat << EOF
-Usage: kreboot [kernel]
+Usage: kreboot [option ...] [kernel]
+Options are:
+	--wait, -w N	wait N seconds before reboot (default $pause)
+	--nowait	don't wait, reboot immediately
 EOF
 	exit $1
 }
@@ -19,6 +25,14 @@ hash grubby kexec systemctl
 target=''
 while test $# -gt 0; do
 	case $1 in
+		-w|--wait)
+			# FIXME: check that arg exists
+			wait=$2
+			shift
+			;;
+		--nowait)
+			wait=0
+			;;
 		-*)
 			echo "Unrecognized option: $1" 1>&2
 			usage 1
@@ -49,7 +63,11 @@ if ! info=$(grubby --info=$target); then
 fi
 eval $(echo "$info" | sed "s|^\(\S*\)=\([^'\"].*\)$|\1='\2'|")
 
-echo Boot "$title"?
-read
+echo Booting $title...
+if [ "$pause" -ne 0 ]; then
+	echo Press Ctrl-C within $pause seconds to cancel
+	sleep $pause
+fi
+
 kexec -l "$kernel" --initrd="$initrd" --command-line="root=$root $args"
 systemctl kexec
