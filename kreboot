@@ -8,10 +8,20 @@ set -e
 hash grubby kexec systemctl
 
 target=$1
-[ -z "$target" ] &&
-	target=`grubby --default-kernel`
+if [ -z "$target" ]; then
+	if ! target=$(grubby --default-kernel); then
+		# grubby prints error to stdout
+		echo "grubby: $target" 1>&2
+		exit 1
+	fi
+fi
 
-eval $(grubby --info=$target | sed "s|^\(\S*\)=\([^'\"].*\)$|\1='\2'|")
+if ! info=$(grubby --info=$target); then
+	# grubby prints error to stdout
+	echo "grubby: $info" 1>&2
+	exit 1
+fi
+eval $(echo "$info" | sed "s|^\(\S*\)=\([^'\"].*\)$|\1='\2'|")
 
 echo Boot "$title"?
 read
