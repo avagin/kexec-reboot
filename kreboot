@@ -10,11 +10,9 @@ hash grubby kexec systemctl
 target=$1
 [ -z "$target" ] &&
 	target=`grubby --default-kernel`
-IFS='
-'
-for l in `grubby --info=$target`; do
-	eval `echo $l | sed "s|^\(\S*\)=\([^'\"].*\)$|\1='\2'|"`
-done
+
+eval $(grubby --info=$target | sed "s|^\(\S*\)=\([^'\"].*\)$|\1='\2'|")
+
 echo Boot "$title"?
 read
 kexec -l "$kernel" --initrd="$initrd" --command-line="root=$root $args"
