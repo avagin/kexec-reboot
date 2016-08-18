@@ -13,6 +13,7 @@ Usage: kreboot [option ...] [kernel]
 Options are:
 	--wait, -w N	wait N seconds before reboot (default $pause)
 	--nowait	don't wait, reboot immediately
+	--help, -h	show this help message
 EOF
 	exit $1
 }
@@ -43,6 +44,9 @@ while test $# -gt 0; do
 			;;
 		--nowait)
 			wait=0
+			;;
+		-h|--help)
+			usage 0
 			;;
 		-*)
 			uerr "Unrecognized option: $1"
