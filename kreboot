@@ -3,11 +3,36 @@
 set -e
 [ -n "$BASH" ] && set -o pipefail
 
+usage() {
+	cat << EOF
+Usage: kreboot [kernel]
+EOF
+	exit $1
+}
+
 # Check that all programs we need are available, exit if not
 # (relying on 'set -e' and hash returning non-zero for errors)
 hash grubby kexec systemctl
 
-target=$1
+# Process options and arguments
+target=''
+while test $# -gt 0; do
+	case $1 in
+		-*)
+			echo "Unrecognized option: $1" 1>&2
+			usage 1
+			;;
+		*)
+			if [ -n "$target" ]; then
+				echo "Extra arguments: $*" 1>&2
+				usage 1
+			fi
+			target=$1
+			;;
+	esac
+	shift
+done
+
 if [ -z "$target" ]; then
 	if ! target=$(grubby --default-kernel); then
 		# grubby prints error to stdout
