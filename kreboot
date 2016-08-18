@@ -17,6 +17,12 @@ EOF
 	exit $1
 }
 
+uerr() {
+	echo "ERROR: $*" 2>&1
+	echo
+	usage 1
+}
+
 # Check that all programs we need are available, exit if not
 # (relying on 'set -e' and hash returning non-zero for errors)
 hash grubby kexec systemctl
@@ -27,13 +33,11 @@ while test $# -gt 0; do
 	case $1 in
 		-w|--wait)
 			if [ "$#" -lt 2 ]; then
-				echo "Option $1 requires an argument" 1>&2
-				usage 1
+				uerr "Option $1 requires an argument"
 			fi
 			wait=$2
 			if ! printf "%f" $wait > /dev/null 2>&1; then
-				echo "Option $1 argument not a number" 1>&2
-				usage 1
+				uerr "Option $1 argument not a number"
 			fi
 			shift
 			;;
@@ -41,13 +45,11 @@ while test $# -gt 0; do
 			wait=0
 			;;
 		-*)
-			echo "Unrecognized option: $1" 1>&2
-			usage 1
+			uerr "Unrecognized option: $1"
 			;;
 		*)
 			if [ -n "$target" ]; then
-				echo "Extra arguments: $*" 1>&2
-				usage 1
+				uerr "Extra arguments: $*"
 			fi
 			target=$1
 			;;
