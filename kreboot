@@ -5,7 +5,7 @@ set -e
 set -u
 
 # defaults
-pause=10
+wait=10
 
 usage() {
 	cat << EOF
@@ -77,9 +77,9 @@ fi
 eval $(echo "$info" | sed "s|^\(\S*\)=\([^'\"].*\)$|\1='\2'|")
 
 echo Booting $title...
-if [ "$pause" -ne 0 ]; then
+if [ "$wait" -ne 0 ]; then
 	echo Press Ctrl-C within $pause seconds to cancel
-	sleep $pause
+	sleep $wait
 fi
 
 kexec -l "$kernel" --initrd="$initrd" --command-line="root=$root $args"
