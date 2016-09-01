@@ -9,11 +9,14 @@ wait=10
 
 usage() {
 	cat << EOF
-Usage: kreboot [option ...] [kernel]
+Usage: kreboot [option ...] [kernel|boot-index]
 Options are:
 	--wait, -w N	wait N seconds before reboot (default $wait)
 	--nowait	don't wait, reboot immediately
 	--help, -h	show this help message
+
+Example:
+	$0 0	Boot kernel with index 0
 EOF
 	exit $1
 }
@@ -81,6 +84,5 @@ if [ "$wait" -ne 0 ]; then
 	echo Press Ctrl-C within $wait seconds to cancel
 	sleep $wait
 fi
-
 kexec -l "$kernel" --initrd="$initrd" --command-line="root=$root $args"
 systemctl kexec
