@@ -11,7 +11,7 @@ usage() {
 	cat << EOF
 Usage: kreboot [option ...] [kernel]
 Options are:
-	--wait, -w N	wait N seconds before reboot (default $pause)
+	--wait, -w N	wait N seconds before reboot (default $wait)
 	--nowait	don't wait, reboot immediately
 	--help, -h	show this help message
 EOF
@@ -78,7 +78,7 @@ eval $(echo "$info" | sed "s|^\(\S*\)=\([^'\"].*\)$|\1='\2'|")
 
 echo Booting $title...
 if [ "$wait" -ne 0 ]; then
-	echo Press Ctrl-C within $pause seconds to cancel
+	echo Press Ctrl-C within $wait seconds to cancel
 	sleep $wait
 fi
 
