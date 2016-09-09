@@ -6,6 +6,7 @@ set -u
 
 # defaults
 wait=10
+detach_wait=3
 
 usage() {
 	cat << EOF
@@ -13,6 +14,7 @@ Usage: kreboot [option ...] [kernel|boot-index]
 Options are:
 	--wait, -w N	wait N seconds before reboot (default $wait)
 	--nowait	don't wait, reboot immediately
+	--detach	Schedule reboot and return. Suitable to remote reboot.
 	--help, -h	show this help message
 
 Example:
@@ -47,6 +49,19 @@ while test $# -gt 0; do
 			;;
 		--nowait)
 			wait=0
+			;;
+		--detach)
+			detach=yes
+			;;
+		--detach_wait)
+			if [ "$#" -lt 2 ]; then
+				uerr "Option $1 requires an argument"
+			fi
+			detach_wait=$2
+			if ! printf "%f" $detach_wait > /dev/null 2>&1; then
+				uerr "Option $1 argument not a number"
+			fi
+			shift
 			;;
 		-h|--help)
 			usage 0
@@ -85,4 +100,9 @@ if [ "$wait" -ne 0 ]; then
 	sleep $wait
 fi
 kexec -l "$kernel" --initrd="$initrd" --command-line="root=$root $args"
-systemctl kexec
+
+if [ -z "detach" ]; then
+    systemctl kexec
+else
+    setsid bash -c "sleep $detach_wait; systemctl kexec" &>/dev/null < /dev/null &
+fi
