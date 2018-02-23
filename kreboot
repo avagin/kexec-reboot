@@ -36,6 +36,7 @@ hash grubby kexec systemctl
 
 # Process options and arguments
 target=''
+kargs=''
 while test $# -gt 0; do
 	case $1 in
 		-w|--wait)
