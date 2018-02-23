@@ -16,6 +16,7 @@ Options are:
 	--nowait	don't wait, reboot immediately
 	--detach	Schedule reboot and return. Suitable to remote reboot.
 	--help, -h	show this help message
+	--kargs, k	additional kernel arguments
 
 Example:
 	$0 0	Boot kernel with index 0
@@ -66,6 +67,10 @@ while test $# -gt 0; do
 		-h|--help)
 			usage 0
 			;;
+		-k|--kargs)
+			kargs=$2
+			shift
+			;;
 		-*)
 			uerr "Unrecognized option: $1"
 			;;
@@ -99,7 +104,7 @@ if [ "$wait" -ne 0 ]; then
 	echo Press Ctrl-C within $wait seconds to cancel
 	sleep $wait
 fi
-kexec -l "$kernel" --initrd="$initrd" --command-line="root=$root $args"
+kexec -l "$kernel" --initrd="$initrd" --command-line="root=$root $args $kargs"
 
 if [ -z "detach" ]; then
     systemctl kexec
